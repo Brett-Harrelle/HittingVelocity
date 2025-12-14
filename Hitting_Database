@@ -1,0 +1,79 @@
+DROP TABLE IF EXISTS PlayerPitches;
+DROP TABLE IF EXISTS PlayerSeasons;
+DROP TABLE IF EXISTS Teams;
+DROP TABLE IF EXISTS Players;
+
+
+
+
+Create database if not exists HittingVelocity;
+
+Use HittingVelocity;
+
+Create Table Players(
+
+
+	PlayerID INT primary key auto_increment,
+    FirstName varchar(50),
+    LastName varchar(50),
+    Bats varchar(1),
+    Throws varchar(1),
+    BirthDate DATE
+    
+);
+
+Create Table Teams(
+
+	TeamID INT primary key auto_increment,
+    TeamName varchar(50),
+    TeamCity varchar(50),
+    TeamLeague varchar(2),
+    Division varchar(10)
+
+);
+
+
+Create Table PlayerSeasons(
+
+
+	PlayerSeasonID INT primary key auto_increment,
+    PlayerID INT,
+    TeamID INT,
+    SeasonYear INT,
+    Age INT,
+    Foreign Key (PlayerID) references Players(PlayerID),
+    Foreign Key (TeamID) references Teams(TeamID)
+
+);
+
+Create Table PlayerPitches(
+
+	PitchID INT primary key auto_increment,
+    PlayerSeasonID INT,
+    PitchType varchar(10),
+    PitchSpeed Decimal(5,2),
+    
+    Swing boolean,
+    Miss boolean,
+    BallInPlay boolean,
+    
+    IsSingle boolean,
+	IsDouble boolean,
+    IsTriple boolean,
+    IsHomeRun boolean,
+    IsOut boolean,
+    IsStrikeout boolean,
+    IsWalk boolean,
+    
+    Barrel boolean,
+    SquaredUp boolean,
+    HardHit boolean,
+    
+    PitcherThrows char(1),
+    ExitVelocity Decimal(5,2),
+    LaunchAngle Decimal (5,2),
+    
+    foreign key (PlayerSeasonID) references PlayerSeasons (PlayerSeasonID)
+
+);
+
