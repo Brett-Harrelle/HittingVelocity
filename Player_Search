@@ -1,0 +1,92 @@
+DROP VIEW IF EXISTS Player_Search;
+
+CREATE VIEW Player_Search AS
+SELECT 
+    p.PlayerID,
+    CONCAT(p.FirstName, ' ', p.LastName) as PlayerName,
+    p.FirstName,
+    p.LastName,
+    p.Bats,
+    p.Throws,
+    p.BirthDate,
+    
+    -- Career summary
+    (SELECT COUNT(DISTINCT SeasonYear) 
+     FROM PlayerSeasons ps 
+     WHERE ps.PlayerID = p.PlayerID) as SeasonsPlayed,
+    
+    (SELECT MIN(SeasonYear) 
+     FROM PlayerSeasons ps 
+     WHERE ps.PlayerID = p.PlayerID) as FirstSeason,
+    
+    (SELECT MAX(SeasonYear) 
+     FROM PlayerSeasons ps 
+     WHERE ps.PlayerID = p.PlayerID) as LastSeason,
+    
+    -- Search-friendly fields
+    LOWER(CONCAT(p.FirstName, ' ', p.LastName)) as SearchFullName,
+    LOWER(p.FirstName) as SearchFirstName,
+    LOWER(p.LastName) as SearchLastName,
+    
+    -- Most recent team
+    (SELECT t.TeamName 
+     FROM PlayerSeasons ps 
+     JOIN Teams t ON ps.TeamID = t.TeamID
+     WHERE ps.PlayerID = p.PlayerID 
+     ORDER BY ps.SeasonYear DESC 
+     LIMIT 1) as MostRecentTeam,
+    
+    -- check if player has high velocity data
+    (SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+     FROM PlayerPitches pp
+     JOIN PlayerSeasons ps ON pp.PlayerSeasonID = ps.PlayerSeasonID
+     WHERE ps.PlayerID = p.PlayerID 
+       AND pp.PitchSpeed >= 96) as HasHighVelocityData
+    
+FROM Players p
+WHERE EXISTS (
+    SELECT 1 
+    FROM PlayerSeasons ps 
+    WHERE ps.PlayerID = p.PlayerID
+);
+
+-- Test 1: Basic verification
+SELECT 'Test 1: Player_Search Created' as TestStep,
+       COUNT(*) as TotalPlayers,
+       COUNT(CASE WHEN SeasonsPlayed >= 3 THEN 1 END) as PlayersWith3PlusSeasons,
+       COUNT(CASE WHEN HasHighVelocityData = 1 THEN 1 END) as PlayersWithHighVeloData
+FROM Player_Search;
+
+-- Test 2: Sample search - find players with "jos" in name
+SELECT 'Test 2: Search Test "jos"' as TestStep,
+       PlayerName,
+       FirstName,
+       LastName,
+       SeasonsPlayed,
+       MostRecentTeam,
+       HasHighVelocityData
+FROM Player_Search
+WHERE SearchFirstName LIKE '%jos%' OR SearchLastName LIKE '%jos%'
+ORDER BY LastName
+LIMIT 10;
+
+-- Test 3: Sample search - find players with "trout" in name
+SELECT 'Test 3: Search Test "trout"' as TestStep,
+       PlayerName,
+       FirstName,
+       LastName,
+       SeasonsPlayed,
+       MostRecentTeam,
+       HasHighVelocityData
+FROM Player_Search
+WHERE SearchLastName LIKE '%trout%'
+LIMIT 10;
+
+-- Test 4: Check data quality
+SELECT 'Test 4: Data Quality Check' as TestStep,
+       COUNT(*) as TotalPlayers,
+       COUNT(MostRecentTeam) as PlayersWithTeamInfo,
+       ROUND(AVG(SeasonsPlayed), 1) as AvgSeasonsPerPlayer,
+       MIN(FirstSeason) as EarliestSeason,
+       MAX(LastSeason) as LatestSeason
+FROM Player_Search;
