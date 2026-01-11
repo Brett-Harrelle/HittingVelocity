@@ -1,0 +1,141 @@
+DROP VIEW IF EXISTS Velocity_Buckets;
+
+CREATE VIEW Velocity_Buckets AS
+SELECT 
+    -- Player Identity
+    p.PlayerID,
+    CONCAT(p.FirstName, ' ', p.LastName) as PlayerName,
+    p.FirstName,
+    p.LastName,
+    p.Bats,
+    p.Throws,
+    
+    -- Season Context
+    ps.PlayerSeasonID,
+    ps.SeasonYear,
+    ps.Age,
+    t.TeamID,
+    t.TeamName,
+    t.TeamLeague,
+    t.Division,
+    
+    -- Pitch Information
+    pp.PitchID,
+    pp.PitchType,
+    pp.PitchSpeed,
+    pp.Swing,
+    pp.Miss,
+    pp.BallInPlay,
+    pp.IsHomeRun,
+    pp.IsSingle,
+    pp.IsDouble,
+    pp.IsTriple,
+    pp.IsOut,
+    pp.IsStrikeout,
+    pp.IsWalk,
+    pp.Barrel,
+    pp.SquaredUp,
+    pp.HardHit,
+    pp.ExitVelocity,
+    pp.LaunchAngle,
+    pp.PitcherThrows,
+    
+    -- BOOLEAN FLAGS for each threshold
+    CASE WHEN pp.PitchSpeed >= 90 THEN 1 ELSE 0 END as Is90Plus,
+    CASE WHEN pp.PitchSpeed >= 91 THEN 1 ELSE 0 END as Is91Plus,
+    CASE WHEN pp.PitchSpeed >= 92 THEN 1 ELSE 0 END as Is92Plus,
+    CASE WHEN pp.PitchSpeed >= 93 THEN 1 ELSE 0 END as Is93Plus,
+    CASE WHEN pp.PitchSpeed >= 94 THEN 1 ELSE 0 END as Is94Plus,
+    CASE WHEN pp.PitchSpeed >= 95 THEN 1 ELSE 0 END as Is95Plus,
+    CASE WHEN pp.PitchSpeed >= 96 THEN 1 ELSE 0 END as Is96Plus,
+    CASE WHEN pp.PitchSpeed >= 97 THEN 1 ELSE 0 END as Is97Plus,
+    CASE WHEN pp.PitchSpeed >= 98 THEN 1 ELSE 0 END as Is98Plus,
+    CASE WHEN pp.PitchSpeed >= 99 THEN 1 ELSE 0 END as Is99Plus,
+    CASE WHEN pp.PitchSpeed >= 100 THEN 1 ELSE 0 END as Is100Plus,
+    CASE WHEN pp.PitchSpeed >= 101 THEN 1 ELSE 0 END as Is101Plus,
+    CASE WHEN pp.PitchSpeed >= 102 THEN 1 ELSE 0 END as Is102Plus,
+    
+    -- Keep your single label for display purposes
+    CASE 
+        WHEN pp.PitchSpeed >= 102 THEN '102+'
+        WHEN pp.PitchSpeed >= 101 THEN '101+'
+        WHEN pp.PitchSpeed >= 100 THEN '100+'
+        WHEN pp.PitchSpeed >= 99 THEN '99+'
+        WHEN pp.PitchSpeed >= 98 THEN '98+'
+        WHEN pp.PitchSpeed >= 97 THEN '97+'
+        WHEN pp.PitchSpeed >= 96 THEN '96+'
+        WHEN pp.PitchSpeed >= 95 THEN '95+'
+        WHEN pp.PitchSpeed >= 94 THEN '94+'
+        WHEN pp.PitchSpeed >= 93 THEN '93+'
+        WHEN pp.PitchSpeed >= 92 THEN '92+'
+        WHEN pp.PitchSpeed >= 91 THEN '91+'
+        WHEN pp.PitchSpeed >= 90 THEN '90+'
+        ELSE 'Under 90'
+    END as VelocityBin,
+    
+    -- Grouped ranges
+    CASE 
+        WHEN pp.PitchSpeed >= 98.0 AND pp.PitchSpeed < 100.0 THEN '98.0-99.99'
+        WHEN pp.PitchSpeed >= 96.0 AND pp.PitchSpeed < 98.0 THEN '96.0-97.99'
+        WHEN pp.PitchSpeed >= 94.0 AND pp.PitchSpeed < 96.0 THEN '94.0-95.99'
+        WHEN pp.PitchSpeed >= 92.0 AND pp.PitchSpeed < 94.0 THEN '92.0-93.99'
+        WHEN pp.PitchSpeed >= 90.0 AND pp.PitchSpeed < 92.0 THEN '90.0-91.99'
+        ELSE 'Under 90'
+    END as VelocityGroup
+    
+FROM PlayerPitches pp
+JOIN PlayerSeasons ps ON pp.PlayerSeasonID = ps.PlayerSeasonID
+JOIN Players p ON ps.PlayerID = p.PlayerID
+JOIN Teams t ON ps.TeamID = t.TeamID
+WHERE pp.PitchSpeed >= 85;
+
+-- Test 1: Check BOOLEAN FLAGS
+SELECT 'Boolean Flag Test' as Test,
+       SUM(Is90Plus) as '90+ (ALL ≥90 mph)',
+       SUM(Is91Plus) as '91+ (ALL ≥91 mph)',
+       SUM(Is92Plus) as '92+ (ALL ≥92 mph)',
+       SUM(Is96Plus) as '96+ (ALL ≥96 mph)',
+       SUM(Is98Plus) as '98+ (ALL ≥98 mph)'
+FROM Velocity_Buckets;
+
+-- Test 2: Verify cumulative nature
+SELECT 'Cumulative Check' as Test,
+       CASE 
+           WHEN SUM(Is90Plus) > SUM(Is91Plus) THEN '✓ CORRECT: 90+ > 91+'
+           ELSE '✗ WRONG: 90+ should be larger than 91+'
+       END as Check_90_91,
+       CASE 
+           WHEN SUM(Is91Plus) > SUM(Is92Plus) THEN '✓ CORRECT: 91+ > 92+'
+           ELSE '✗ WRONG: 91+ should be larger than 92+'
+       END as Check_91_92,
+       CASE 
+           WHEN SUM(Is96Plus) > SUM(Is98Plus) THEN '✓ CORRECT: 96+ > 98+'
+           ELSE '✗ WRONG: 96+ should be larger than 98+'
+       END as Check_96_98
+FROM Velocity_Buckets;
+
+-- Test 3: Show what VelocityBin actually gives you
+SELECT 'What VelocityBin Actually Means' as Test,
+       VelocityBin,
+       COUNT(*) as PitchCount,
+       MIN(PitchSpeed) as MinSpeed,
+       MAX(PitchSpeed) as MaxSpeed
+FROM Velocity_Buckets
+WHERE PitchSpeed >= 90
+GROUP BY VelocityBin
+ORDER BY 
+    CASE 
+        WHEN VelocityBin = '102+' THEN 13
+        WHEN VelocityBin = '101+' THEN 12
+        WHEN VelocityBin = '100+' THEN 11
+        WHEN VelocityBin = '99+' THEN 10
+        WHEN VelocityBin = '98+' THEN 9
+        WHEN VelocityBin = '97+' THEN 8
+        WHEN VelocityBin = '96+' THEN 7
+        WHEN VelocityBin = '95+' THEN 6
+        WHEN VelocityBin = '94+' THEN 5
+        WHEN VelocityBin = '93+' THEN 4
+        WHEN VelocityBin = '92+' THEN 3
+        WHEN VelocityBin = '91+' THEN 2
+        WHEN VelocityBin = '90+' THEN 1
+    END DESC;
