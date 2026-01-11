@@ -1,0 +1,200 @@
+DROP VIEW IF EXISTS Player_Leaderboard;
+
+CREATE VIEW Player_Leaderboard AS
+WITH PerformanceData AS (
+    SELECT 
+        -- Player and Season Info
+        vb.PlayerID,
+        vb.PlayerName,
+        vb.FirstName,
+        vb.LastName,
+        vb.Bats,
+        vb.PlayerSeasonID,
+        vb.SeasonYear,
+        vb.Age,
+        vb.TeamName,
+        vb.TeamLeague,
+        vb.Division,
+        
+        -- Determine which thresholds this pitch belongs to
+        CASE WHEN vb.Is90Plus = 1 THEN '90+' END as Threshold90Plus,
+        CASE WHEN vb.Is91Plus = 1 THEN '91+' END as Threshold91Plus,
+        CASE WHEN vb.Is92Plus = 1 THEN '92+' END as Threshold92Plus,
+        CASE WHEN vb.Is93Plus = 1 THEN '93+' END as Threshold93Plus,
+        CASE WHEN vb.Is94Plus = 1 THEN '94+' END as Threshold94Plus,
+        CASE WHEN vb.Is95Plus = 1 THEN '95+' END as Threshold95Plus,
+        CASE WHEN vb.Is96Plus = 1 THEN '96+' END as Threshold96Plus,
+        CASE WHEN vb.Is97Plus = 1 THEN '97+' END as Threshold97Plus,
+        CASE WHEN vb.Is98Plus = 1 THEN '98+' END as Threshold98Plus,
+        CASE WHEN vb.Is99Plus = 1 THEN '99+' END as Threshold99Plus,
+        CASE WHEN vb.Is100Plus = 1 THEN '100+' END as Threshold100Plus,
+        CASE WHEN vb.Is101Plus = 1 THEN '101+' END as Threshold101Plus,
+        CASE WHEN vb.Is102Plus = 1 THEN '102+' END as Threshold102Plus,
+        
+        -- keep the exact velocity bin
+        vb.VelocityBin as ExactVelocityBin,
+        
+        -- Grouped ranges
+        vb.VelocityGroup,
+        
+        -- Pitch metrics
+        vb.Swing,
+        vb.Miss,
+        vb.BallInPlay,
+        vb.IsHomeRun,
+        vb.IsSingle,
+        vb.IsDouble,
+        vb.IsTriple,
+        vb.Barrel,
+        vb.SquaredUp,
+        vb.HardHit,
+        vb.ExitVelocity,
+        vb.LaunchAngle,
+        vb.PitchSpeed
+        
+    FROM Velocity_Buckets vb
+    WHERE vb.PitchSpeed >= 90
+),
+AggregatedData AS (
+    SELECT 
+        PlayerID,
+        PlayerName,
+        FirstName,
+        LastName,
+        Bats,
+        PlayerSeasonID,
+        SeasonYear,
+        Age,
+        TeamName,
+        TeamLeague,
+        Division,
+        
+        -- Unpivot thresholds
+        COALESCE(
+            Threshold102Plus, Threshold101Plus, Threshold100Plus, Threshold99Plus,
+            Threshold98Plus, Threshold97Plus, Threshold96Plus, Threshold95Plus,
+            Threshold94Plus, Threshold93Plus, Threshold92Plus, Threshold91Plus,
+            Threshold90Plus
+        ) as VelocityThreshold,
+        
+        ExactVelocityBin,
+        VelocityGroup,
+        
+        -- Aggregated metrics
+        COUNT(*) as TotalPitches,
+        SUM(Swing) as Swings,
+        SUM(Miss) as Misses,
+        SUM(BallInPlay) as BallsInPlay,
+        SUM(IsHomeRun) as HomeRuns,
+        SUM(IsSingle) as Singles,
+        SUM(IsDouble) as Doubles,
+        SUM(IsTriple) as Triples,
+        SUM(IsSingle + IsDouble + IsTriple + IsHomeRun) as TotalHits,
+        SUM(IsDouble + IsTriple + IsHomeRun) as TotalXBH,
+        SUM(Barrel) as Barrels,
+        SUM(SquaredUp) as SquaredUpCount,
+        SUM(HardHit) as HardHits,
+        AVG(ExitVelocity) as AvgExitVelocityRaw,
+        AVG(LaunchAngle) as AvgLaunchAngleRaw,
+        AVG(PitchSpeed) as AvgPitchSpeedRaw
+        
+    FROM PerformanceData
+    GROUP BY 
+        PlayerID, PlayerName, FirstName, LastName, Bats,
+        PlayerSeasonID, SeasonYear, Age, TeamName, TeamLeague, Division,
+        COALESCE(
+            Threshold102Plus, Threshold101Plus, Threshold100Plus, Threshold99Plus,
+            Threshold98Plus, Threshold97Plus, Threshold96Plus, Threshold95Plus,
+            Threshold94Plus, Threshold93Plus, Threshold92Plus, Threshold91Plus,
+            Threshold90Plus
+        ),
+        ExactVelocityBin,
+        VelocityGroup
+    HAVING COUNT(*) >= 20  -- Minimum for leaderboards
+)
+SELECT 
+    -- Basic info
+    PlayerID,
+    PlayerName,
+    FirstName,
+    LastName,
+    Bats,
+    PlayerSeasonID,
+    SeasonYear,
+    Age,
+    TeamName,
+    TeamLeague,
+    Division,
+    VelocityThreshold,
+    ExactVelocityBin,
+    VelocityGroup,
+    TotalPitches,
+    
+    -- Count metrics
+    HomeRuns,
+    TotalXBH,
+    TotalHits,
+    Swings,
+    Misses,
+    BallsInPlay,
+    Barrels,
+    SquaredUpCount as SquaredUp,
+    HardHits,
+    
+    -- Calculated percentages
+    ROUND(HomeRuns * 100.0 / NULLIF(TotalPitches, 0), 3) as HRPercent,
+    ROUND(HomeRuns * 100.0 / NULLIF(Swings, 0), 3) as HRPerSwingPercent,
+    ROUND(TotalXBH * 100.0 / NULLIF(TotalPitches, 0), 3) as XBHPercent,
+    ROUND(TotalXBH * 100.0 / NULLIF(BallsInPlay, 0), 3) as XBHPerBIPPercent,
+    ROUND(TotalHits * 100.0 / NULLIF(BallsInPlay, 0), 3) as BattingAvg,
+    
+    -- Slugging
+    ROUND((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) * 1.0 / 
+          NULLIF(BallsInPlay, 0), 3) as SluggingPct,
+    
+    -- Swing/Miss metrics
+    ROUND(Swings * 100.0 / NULLIF(TotalPitches, 0), 2) as SwingPercent,
+    ROUND(Misses * 100.0 / NULLIF(Swings, 0), 2) as WhiffPercent,
+    
+    -- Quality of contact
+    ROUND(Barrels * 100.0 / NULLIF(TotalPitches, 0), 2) as BarrelPercent,
+    ROUND(HardHits * 100.0 / NULLIF(TotalPitches, 0), 2) as HardHitPercent,
+    ROUND(SquaredUpCount * 100.0 / NULLIF(TotalPitches, 0), 2) as SquaredUpPercent,
+    
+    -- Averages (rounded)
+    ROUND(AvgExitVelocityRaw, 1) as AvgExitVelocity,
+    ROUND(AvgLaunchAngleRaw, 1) as AvgLaunchAngle,
+    ROUND(AvgPitchSpeedRaw, 1) as AvgPitchSpeed
+    
+FROM AggregatedData;
+
+-- Test 1: Basic check
+SELECT 'Test 1: Player_Leaderboard Created' as TestStep,
+       COUNT(*) as TotalRows,
+       COUNT(DISTINCT PlayerID) as UniquePlayers
+FROM Player_Leaderboard;
+
+-- Test 2: Check data
+SELECT 'Test 2: Sample Data' as TestStep,
+       PlayerName,
+       SeasonYear,
+       VelocityThreshold,
+       TotalPitches,
+       HomeRuns,
+       ROUND(HRPercent, 2) as HRPercent,
+       ROUND(SwingPercent, 1) as SwingPercent
+FROM Player_Leaderboard
+WHERE TotalPitches >= 100
+ORDER BY HRPercent DESC
+LIMIT 5;
+
+-- Test 3: Check metrics
+SELECT 'Test 3: Metric Ranges' as TestStep,
+       MIN(HRPercent) as MinHRPercent,
+       MAX(HRPercent) as MaxHRPercent,
+       AVG(HRPercent) as AvgHRPercent,
+       MIN(SwingPercent) as MinSwingPercent,
+       MAX(SwingPercent) as MaxSwingPercent,
+       AVG(SwingPercent) as AvgSwingPercent
+FROM Player_Leaderboard
+WHERE TotalPitches >= 50;
