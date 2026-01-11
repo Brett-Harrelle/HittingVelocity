@@ -40,7 +40,6 @@ SELECT
     pp.LaunchAngle,
     pp.PitcherThrows,
     
-    -- BOOLEAN FLAGS for each threshold
     CASE WHEN pp.PitchSpeed >= 90 THEN 1 ELSE 0 END as Is90Plus,
     CASE WHEN pp.PitchSpeed >= 91 THEN 1 ELSE 0 END as Is91Plus,
     CASE WHEN pp.PitchSpeed >= 92 THEN 1 ELSE 0 END as Is92Plus,
@@ -55,7 +54,6 @@ SELECT
     CASE WHEN pp.PitchSpeed >= 101 THEN 1 ELSE 0 END as Is101Plus,
     CASE WHEN pp.PitchSpeed >= 102 THEN 1 ELSE 0 END as Is102Plus,
     
-    -- Keep your single label for display purposes
     CASE 
         WHEN pp.PitchSpeed >= 102 THEN '102+'
         WHEN pp.PitchSpeed >= 101 THEN '101+'
