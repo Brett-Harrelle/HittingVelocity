@@ -1,0 +1,9 @@
+Select * FROM Teams;
+Select * FROM PlayerPitches;
+Select * FROM PlayerSeasons;
+Select * FROM Players;
+SELECT COUNT(*) FROM player_performance;
+SELECT COUNT(*) FROM velocity_buckets;
+SELECT COUNT(*) FROM player_search;
+SELECT COUNT(*) FROM player_leaderboard;
+
