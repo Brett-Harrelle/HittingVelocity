@@ -32,10 +32,10 @@ teams_df = pd.read_sql("SELECT TeamID, TeamName FROM Teams", engine)
 abbr_to_name = {
     'NYY': 'Yankees', 'BOS': 'Red Sox', 'TOR': 'Blue Jays', 'TB': 'Rays', 'BAL': 'Orioles',
     'CWS': 'White Sox', 'CLE': 'Indians', 'DET': 'Tigers', 'KC': 'Royals', 'MIN': 'Twins',
-    'HOU': 'Astros', 'LAA': 'Angels', 'OAK': 'Athletics', 'SEA': 'Mariners', 'TEX': 'Rangers',
+    'HOU': 'Astros', 'LAA': 'Angels', 'ATH': 'Athletics', 'SEA': 'Mariners', 'TEX': 'Rangers',
     'NYM': 'Mets', 'PHI': 'Phillies', 'ATL': 'Braves', 'MIA': 'Marlins', 'WSH': 'Nationals',
     'CHC': 'Cubs', 'STL': 'Cardinals', 'MIL': 'Brewers', 'CIN': 'Reds', 'PIT': 'Pirates',
-    'LAD': 'Dodgers', 'SF': 'Giants', 'SD': 'Padres', 'ARI': 'Diamondbacks', 'COL': 'Rockies'
+    'LAD': 'Dodgers', 'SF': 'Giants', 'SD': 'Padres', 'AZ': 'Diamondbacks', 'COL': 'Rockies'
 }
 
 all_data['batter_team_abbr'] = all_data.apply(
