@@ -1,13 +1,17 @@
 Which Hitters Handle High Velocity the Best in the 2020s
+
 Brett Harrelle
-Environment
+
+Environment:
+
 Dataset - Statcast
 2021 season - 2025 season
 Python - pycharm
 MySQL - database
 Power BI - visualization
-Pitch Speed
-	Categories
+
+Pitch Speed Categories:
+	
 90+
 91+
 92+
@@ -30,7 +34,8 @@ Pitch Speed
 98.0-99.99
 
 
-Sub Categories	
+Sub Categories:
+
 HRs
 HR %
 HR / ab
@@ -48,26 +53,33 @@ Hard hit %
 Squared up %
 
 
-Potential Sub Categories
+Potential Sub Categories:
+
 Expected numbers
 etc.
 
-Need
+Need:
+
 Player name
 Fastball pitch type only (4-seam, 2-seam, sinker, cutter)
 etc.
 
-Charts
+Charts:
+
 Histogram for pitch velocity
 Top 10 lists
 Scatter plot for velo vs hr rate
 Individual player search to show distribution over pitch speeds
 Be able to select each year
 etc.
-Additional Information
+
+Additional Information:
+
 Hitters who improve or get worse as velo increases
 Show year by year 
 Career
-Bonus
+
+Bonus:
+
 Pitch type + velo
 
