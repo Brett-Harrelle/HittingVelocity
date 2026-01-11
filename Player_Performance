@@ -1,0 +1,84 @@
+DROP VIEW IF EXISTS Player_Performance;
+
+CREATE VIEW Player_Performance AS
+SELECT 
+    vb.PlayerID,
+    vb.PlayerName,
+    vb.FirstName,
+    vb.LastName,
+    vb.Bats,
+    vb.PlayerSeasonID,
+    vb.SeasonYear,
+    vb.Age,
+    vb.TeamName,
+    vb.TeamLeague,
+    vb.Division,
+    '90+' as VelocityThreshold,
+    vb.VelocityBin,
+    vb.VelocityGroup,
+    COUNT(*) as TotalPitches,
+    SUM(vb.Swing) as Swings,
+    SUM(vb.Miss) as Misses,
+    SUM(vb.BallInPlay) as BallsInPlay,
+    SUM(vb.IsHomeRun) as HomeRuns,
+    SUM(vb.IsSingle) as Singles,
+    SUM(vb.IsDouble) as Doubles,
+    SUM(vb.IsTriple) as Triples,
+    SUM(vb.IsSingle + vb.IsDouble + vb.IsTriple + vb.IsHomeRun) as TotalHits,
+    SUM(vb.IsDouble + vb.IsTriple + vb.IsHomeRun) as TotalXBH,
+    SUM(vb.Barrel) as Barrels,
+    SUM(vb.SquaredUp) as SquaredUp,
+    SUM(vb.HardHit) as HardHits,
+    AVG(vb.ExitVelocity) as AvgExitVelocity,
+    AVG(vb.LaunchAngle) as AvgLaunchAngle,
+    AVG(vb.PitchSpeed) as AvgPitchSpeed
+FROM velocity_buckets vb
+WHERE vb.Is90Plus = 1
+GROUP BY 
+    vb.PlayerID, vb.PlayerName, vb.FirstName, vb.LastName, vb.Bats,
+    vb.PlayerSeasonID, vb.SeasonYear, vb.Age, vb.TeamName, vb.TeamLeague, vb.Division,
+    vb.VelocityBin, vb.VelocityGroup
+HAVING COUNT(*) >= 10;
+
+-- Test 1: Count check
+SELECT 'Test 1: Row Count' as Test, COUNT(*) as TotalRows FROM Player_Performance;
+
+-- Test 2: Sample data
+SELECT 'Test 2: Sample Data' as Test;
+SELECT PlayerName, SeasonYear, VelocityThreshold, TotalPitches, HomeRuns 
+FROM Player_Performance 
+WHERE TotalPitches >= 100
+ORDER BY HomeRuns DESC
+LIMIT 5;
+
+-- Test 3: Velocity distribution
+SELECT 'Test 3: Velocity Bin Distribution' as Test;
+SELECT VelocityBin, COUNT(*) as PlayerCount, SUM(TotalPitches) as TotalPitches
+FROM Player_Performance
+GROUP BY VelocityBin
+ORDER BY 
+    CASE 
+        WHEN VelocityBin = '102+' THEN 13
+        WHEN VelocityBin = '101+' THEN 12
+        WHEN VelocityBin = '100+' THEN 11
+        WHEN VelocityBin = '99+' THEN 10
+        WHEN VelocityBin = '98+' THEN 9
+        WHEN VelocityBin = '97+' THEN 8
+        WHEN VelocityBin = '96+' THEN 7
+        WHEN VelocityBin = '95+' THEN 6
+        WHEN VelocityBin = '94+' THEN 5
+        WHEN VelocityBin = '93+' THEN 4
+        WHEN VelocityBin = '92+' THEN 3
+        WHEN VelocityBin = '91+' THEN 2
+        WHEN VelocityBin = '90+' THEN 1
+    END DESC;
+
+-- Test 4: Data quality
+SELECT 'Test 4: Data Quality' as Test;
+SELECT 
+    COUNT(DISTINCT PlayerID) as UniquePlayers,
+    COUNT(DISTINCT SeasonYear) as Seasons,
+    MIN(TotalPitches) as MinPitches,
+    MAX(TotalPitches) as MaxPitches,
+    ROUND(AVG(TotalPitches), 0) as AvgPitches
+FROM Player_Performance;
