@@ -296,7 +296,7 @@ SELECT
     ROUND(HomeRuns * 100.0 / NULLIF(Swings, 0), 3) as HRPerSwingPercent,
     ROUND(TotalXBH * 100.0 / NULLIF(TotalPitches, 0), 3) as XBHPercent,
     ROUND(TotalXBH * 100.0 / NULLIF(BallsInPlay, 0), 3) as XBHPerBIPPercent,
-    ROUND(TotalHits * 100.0 / NULLIF(BallsInPlay, 0), 3) as BattingAvg,
+    ROUND(TotalHits / NULLIF(BallsInPlay, 0), 3) as BattingAvg,
     
     -- Slugging
     ROUND((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) * 1.0 / 
