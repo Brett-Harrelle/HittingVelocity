@@ -296,8 +296,14 @@ SELECT
     HardHits,
     Strikeouts,
     Walks,
+
+	-- Calculated Totals (Not including HBP or sacrifice hits)
     
+	(BallsInPlay + Strikeouts) as AtBats,
+    (BallsInPlay + Strikeouts + Walks) as PlateAppearances,
+	
     -- Calculated percentages
+
     ROUND(HomeRuns * 100.0 / NULLIF(TotalPitches, 0), 3) as HRPercent,
     ROUND(HomeRuns * 100.0 / NULLIF(Swings, 0), 3) as HRPerSwingPercent,
     ROUND(TotalXBH * 100.0 / NULLIF(TotalPitches, 0), 3) as XBHPercent,
