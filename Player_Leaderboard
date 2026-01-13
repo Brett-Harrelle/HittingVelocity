@@ -307,7 +307,7 @@ SELECT
     
     ROUND(TotalHits / NULLIF(BallsInPlay + Strikeouts, 0), 3) as BattingAvg,
     
-    -- On Base Percentage
+    -- On Base Percentage (not including HBP and Sacrifice hits)
     
     ROUND(TotalHits + Walks / NULLIF(BallsInPlay + Strikeouts, 0), 3) as OnBasePercentageAvg,
     
