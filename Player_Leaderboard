@@ -321,7 +321,7 @@ SELECT
     ROUND((TotalHits + Walks) / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) as OnBasePercentageAvg,
     
     -- Slugging
-    ROUND((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) * 1.0 / NULLIF(BallsInPlay, 0), 3) as SluggingPct,
+    ROUND((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) / NULLIF(BallsInPlay, 0), 3) as SluggingPct,
           
 	-- On Base Plus Slugging
     
