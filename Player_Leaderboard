@@ -285,7 +285,10 @@ SELECT
     TotalPitches,
     
     -- Count metrics
-    HomeRuns,
+    Singles,
+	Doubles,
+	Triples,
+	HomeRuns,
     TotalXBH,
     TotalHits,
     Swings,
