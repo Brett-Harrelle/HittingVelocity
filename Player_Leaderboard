@@ -30,7 +30,8 @@ WITH PitchData AS (
         vb.HardHit,
         vb.ExitVelocity,
         vb.LaunchAngle,
-        vb.IsStrikeout
+        vb.IsStrikeout,
+        vb.IsWalk
     FROM Velocity_Buckets vb
 ),
 -- Create cumulative thresholds
@@ -254,6 +255,7 @@ AggregatedData AS (
         SUM(SquaredUp) as SquaredUpCount,
         SUM(HardHit) as HardHits,
         SUM(IsStrikeout) as Strikeouts,
+        SUM(Iswalk) as Walks,
         AVG(ExitVelocity) as AvgExitVelocityRaw,
         AVG(LaunchAngle) as AvgLaunchAngleRaw,
         AVG(PitchSpeed) as AvgPitchSpeedRaw
@@ -293,17 +295,30 @@ SELECT
     SquaredUpCount as SquaredUp,
     HardHits,
     Strikeouts,
+    Walks,
     
     -- Calculated percentages
     ROUND(HomeRuns * 100.0 / NULLIF(TotalPitches, 0), 3) as HRPercent,
     ROUND(HomeRuns * 100.0 / NULLIF(Swings, 0), 3) as HRPerSwingPercent,
     ROUND(TotalXBH * 100.0 / NULLIF(TotalPitches, 0), 3) as XBHPercent,
     ROUND(TotalXBH * 100.0 / NULLIF(BallsInPlay, 0), 3) as XBHPerBIPPercent,
+    
+    -- Batting Average
+    
     ROUND(TotalHits / NULLIF(BallsInPlay + Strikeouts, 0), 3) as BattingAvg,
     
+    -- On Base Percentage
+    
+    ROUND(TotalHits + Walks / NULLIF(BallsInPlay + Strikeouts, 0), 3) as OnBasePercentageAvg,
+    
     -- Slugging
-    ROUND((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) * 1.0 / 
-          NULLIF(BallsInPlay, 0), 3) as SluggingPct,
+    ROUND((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) * 1.0 / NULLIF(BallsInPlay, 0), 3) as SluggingPct,
+          
+	-- On Base Plus Slugging
+    
+    ROUND(
+        ((TotalHits + Walks) * 1.0 / NULLIF(BallsInPlay + Strikeouts + Walks, 0)) +
+        ((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) * 1.0 / NULLIF(BallsInPlay + Strikeouts, 0)), 3) as OPS,
     
     -- Swing/Miss metrics
     ROUND(Swings * 100.0 / NULLIF(TotalPitches, 0), 2) as SwingPercent,
