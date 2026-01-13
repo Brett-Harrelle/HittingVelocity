@@ -29,7 +29,8 @@ WITH PitchData AS (
         vb.SquaredUp,
         vb.HardHit,
         vb.ExitVelocity,
-        vb.LaunchAngle
+        vb.LaunchAngle,
+        vb.IsStrikeout
     FROM Velocity_Buckets vb
 ),
 -- Create cumulative thresholds
