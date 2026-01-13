@@ -37,7 +37,8 @@ AllThresholds AS (
     -- 90+
     SELECT 
         pd.*,
-        '90+' as VelocityThreshold
+        '90+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 90
     
@@ -46,7 +47,8 @@ AllThresholds AS (
     -- 91+
     SELECT 
         pd.*,
-        '91+' as VelocityThreshold
+        '91+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 91
     
@@ -55,7 +57,8 @@ AllThresholds AS (
     -- 92+ 
     SELECT 
         pd.*,
-        '92+' as VelocityThreshold
+        '92+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 92
     
@@ -64,7 +67,8 @@ AllThresholds AS (
     -- 93+ 
     SELECT 
         pd.*,
-        '93+' as VelocityThreshold
+        '93+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 93
     
@@ -73,7 +77,8 @@ AllThresholds AS (
     -- 94+ 
     SELECT 
         pd.*,
-        '94+' as VelocityThreshold
+        '94+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 94
     
@@ -82,7 +87,8 @@ AllThresholds AS (
     -- 95+
     SELECT 
         pd.*,
-        '95+' as VelocityThreshold
+        '95+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 95
     
@@ -91,7 +97,8 @@ AllThresholds AS (
     -- 96+ 
     SELECT 
         pd.*,
-        '96+' as VelocityThreshold
+        '96+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 96
     
@@ -100,7 +107,8 @@ AllThresholds AS (
     -- 97+ 
     SELECT 
         pd.*,
-        '97+' as VelocityThreshold
+        '97+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 97
     
@@ -109,7 +117,8 @@ AllThresholds AS (
     -- 98+ 
     SELECT 
         pd.*,
-        '98+' as VelocityThreshold
+        '98+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 98
     
@@ -118,7 +127,8 @@ AllThresholds AS (
     -- 99+ 
     SELECT 
         pd.*,
-        '99+' as VelocityThreshold
+        '99+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 99
     
@@ -127,7 +137,8 @@ AllThresholds AS (
     -- 100+ 
     SELECT 
         pd.*,
-        '100+' as VelocityThreshold
+        '100+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 100
     
@@ -136,7 +147,8 @@ AllThresholds AS (
     -- 101+ 
     SELECT 
         pd.*,
-        '101+' as VelocityThreshold
+        '101+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 101
     
@@ -145,7 +157,8 @@ AllThresholds AS (
     -- 102+ 
     SELECT 
         pd.*,
-        '102+' as VelocityThreshold
+        '102+' as VelocityThreshold,
+        'Cumulative' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 102
     
@@ -154,7 +167,8 @@ AllThresholds AS (
     -- 90.0-91.99 
     SELECT 
         pd.*,
-        '90.0-91.99' as VelocityThreshold
+        '90.0-91.99' as VelocityThreshold,
+        'Range' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 90.0 AND pd.PitchSpeed < 92.0
     
@@ -163,7 +177,8 @@ AllThresholds AS (
     -- 92.0-93.99 
     SELECT 
         pd.*,
-        '92.0-93.99' as VelocityThreshold
+        '92.0-93.99' as VelocityThreshold,
+        'Range' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 92.0 AND pd.PitchSpeed < 94.0
     
@@ -172,7 +187,8 @@ AllThresholds AS (
     -- 94.0-95.99 
     SELECT 
         pd.*,
-        '94.0-95.99' as VelocityThreshold
+        '94.0-95.99' as VelocityThreshold,
+        'Range' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 94.0 AND pd.PitchSpeed < 96.0
     
@@ -181,7 +197,8 @@ AllThresholds AS (
     -- 96.0-97.99 
     SELECT 
         pd.*,
-        '96.0-97.99' as VelocityThreshold
+        '96.0-97.99' as VelocityThreshold,
+        'Range' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 96.0 AND pd.PitchSpeed < 98.0
     
@@ -190,9 +207,20 @@ AllThresholds AS (
     -- 98.0-99.99 
     SELECT 
         pd.*,
-        '98.0-99.99' as VelocityThreshold
+        '98.0-99.99' as VelocityThreshold,
+        'Range' as ThresholdType
     FROM PitchData pd
     WHERE pd.PitchSpeed >= 98.0 AND pd.PitchSpeed < 100.0
+    
+     UNION ALL
+    
+    -- 100.0+
+    SELECT 
+        pd.*,
+        '100.0+' as VelocityThreshold,
+        'Range' as ThresholdType
+    FROM PitchData pd
+    WHERE pd.PitchSpeed >= 100.0 AND pd.PitchSpeed < 110.0
 ),
 AggregatedData AS (
     SELECT 
@@ -208,6 +236,7 @@ AggregatedData AS (
         TeamLeague,
         Division,
         VelocityThreshold,
+        ThresholdType,
         
         -- Aggregated metrics
         COUNT(*) as TotalPitches,
@@ -231,7 +260,7 @@ AggregatedData AS (
     GROUP BY 
         PlayerID, PlayerName, FirstName, LastName, Bats,
         PlayerSeasonID, SeasonYear, Age, TeamName, TeamLeague, Division,
-        VelocityThreshold
+        VelocityThreshold, ThresholdType
     HAVING COUNT(*) >= 1  -- Minimum for leaderboards
 )
 SELECT 
@@ -248,6 +277,7 @@ SELECT
     TeamLeague,
     Division,
     VelocityThreshold,
+    ThresholdType,
     TotalPitches,
     
     -- Count metrics
@@ -281,23 +311,25 @@ SELECT
     ROUND(HardHits * 100.0 / NULLIF(TotalPitches, 0), 2) as HardHitPercent,
     ROUND(SquaredUpCount * 100.0 / NULLIF(TotalPitches, 0), 2) as SquaredUpPercent,
     
-    -- Averages (rounded)
+    -- Averages 
     ROUND(AvgExitVelocityRaw, 1) as AvgExitVelocity,
     ROUND(AvgLaunchAngleRaw, 1) as AvgLaunchAngle,
     ROUND(AvgPitchSpeedRaw, 1) as AvgPitchSpeed
     
 FROM AggregatedData;
 
--- Test 1: See all thresholds including new ranges
+-- Test 1: See all thresholds with ThresholdType
 SELECT 
+    ThresholdType,
     VelocityThreshold,
     COUNT(*) as PlayerCount,
     SUM(TotalPitches) as TotalPitches,
     SUM(HomeRuns) as TotalHomeRuns,
     ROUND(SUM(HomeRuns) * 100.0 / SUM(TotalPitches), 3) as OverallHRPercent
 FROM Player_Leaderboard
-GROUP BY VelocityThreshold
+GROUP BY ThresholdType, VelocityThreshold
 ORDER BY 
+    ThresholdType DESC,
     CASE 
         -- Cumulative thresholds first
         WHEN VelocityThreshold = '90+' THEN 1
@@ -314,55 +346,30 @@ ORDER BY
         WHEN VelocityThreshold = '101+' THEN 12
         WHEN VelocityThreshold = '102+' THEN 13
         -- New ranges next
-        WHEN VelocityThreshold = '90.0-91.99' THEN 14
-        WHEN VelocityThreshold = '92.0-93.99' THEN 15
-        WHEN VelocityThreshold = '94.0-95.99' THEN 16
-        WHEN VelocityThreshold = '96.0-97.99' THEN 17
-        WHEN VelocityThreshold = '98.0-99.99' THEN 18
-        ELSE 99
-    END;
-
--- Test 2: Compare cumulative vs specific ranges
-SELECT 
-    'Cumulative 90+' as Type,
-    VelocityThreshold,
-    SUM(TotalPitches) as TotalPitches,
-    SUM(HomeRuns) as TotalHomeRuns,
-    ROUND(SUM(HomeRuns) * 100.0 / SUM(TotalPitches), 3) as HRPercent
-FROM Player_Leaderboard
-WHERE VelocityThreshold IN ('90+', '92+', '94+', '96+', '98+', '100+')
-GROUP BY VelocityThreshold
-
-UNION ALL
-
-SELECT 
-    'Specific Range' as Type,
-    VelocityThreshold,
-    SUM(TotalPitches) as TotalPitches,
-    SUM(HomeRuns) as TotalHomeRuns,
-    ROUND(SUM(HomeRuns) * 100.0 / SUM(TotalPitches), 3) as HRPercent
-FROM Player_Leaderboard
-WHERE VelocityThreshold IN ('90.0-91.99', '92.0-93.99', '94.0-95.99', '96.0-97.99', '98.0-99.99')
-GROUP BY VelocityThreshold
-ORDER BY Type DESC, VelocityThreshold;
-
--- Test 3: Check the new ranges specifically
-SELECT 
-    VelocityThreshold,
-    COUNT(DISTINCT PlayerID) as UniquePlayers,
-    AVG(AvgPitchSpeed) as AverageSpeedInRange,
-    MIN(AvgPitchSpeed) as MinAvgSpeed,
-    MAX(AvgPitchSpeed) as MaxAvgSpeed,
-    SUM(TotalPitches) as TotalPitches,
-    SUM(HomeRuns) as TotalHomeRuns
-FROM Player_Leaderboard
-WHERE VelocityThreshold IN ('90.0-91.99', '92.0-93.99', '94.0-95.99', '96.0-97.99', '98.0-99.99')
-GROUP BY VelocityThreshold
-ORDER BY 
-    CASE 
         WHEN VelocityThreshold = '90.0-91.99' THEN 1
         WHEN VelocityThreshold = '92.0-93.99' THEN 2
         WHEN VelocityThreshold = '94.0-95.99' THEN 3
         WHEN VelocityThreshold = '96.0-97.99' THEN 4
         WHEN VelocityThreshold = '98.0-99.99' THEN 5
+        WHEN VelocityThreshold = '100.0+' THEN 6
+        ELSE 99
     END;
+
+-- Test 2: Verify no double-counting by checking total home runs by type
+SELECT 
+    'Total Home Runs by Threshold Type' as Metric,
+    ThresholdType,
+    SUM(HomeRuns) as TotalHomeRuns,
+    COUNT(DISTINCT PlayerID) as UniquePlayers
+FROM Player_Leaderboard
+GROUP BY ThresholdType;
+
+-- Test 3: Check if ThresholdType correctly separates data
+SELECT 
+    ThresholdType,
+    COUNT(*) as TotalRows,
+    SUM(TotalPitches) as TotalPitchesInView,
+    SUM(HomeRuns) as TotalHomeRunsInView
+FROM Player_Leaderboard
+GROUP BY ThresholdType;
+
