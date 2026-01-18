@@ -312,6 +312,8 @@ SELECT
     ROUND(HomeRuns / NULLIF(Swings, 0), 3) as HRPerSwingPercent,
     ROUND(TotalXBH / NULLIF(BallsInPlay + Strikeouts, 0), 3) as XBHPercent,
     ROUND(TotalXBH / NULLIF(BallsInPlay, 0), 3) as XBHPerBIPPercent,
+	ROUND(Walks / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) as WalkPercent,
+    ROUND(Strikeouts / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) as StrikeoutPercent,
     
     -- Batting Average
     
