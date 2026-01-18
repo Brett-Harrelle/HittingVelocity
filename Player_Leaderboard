@@ -308,9 +308,9 @@ SELECT
 	
     -- Calculated percentages
 
-    ROUND(HomeRuns / NULLIF(TotalPitches, 0), 3) as HRPercent,
+    ROUND(HomeRuns / NULLIF(BallsInPlay + Strikeouts, 0), 3) as HRPercent,
     ROUND(HomeRuns / NULLIF(Swings, 0), 3) as HRPerSwingPercent,
-    ROUND(TotalXBH / NULLIF(TotalPitches, 0), 3) as XBHPercent,
+    ROUND(TotalXBH / NULLIF(BallsInPlay + Strikeouts, 0), 3) as XBHPercent,
     ROUND(TotalXBH / NULLIF(BallsInPlay, 0), 3) as XBHPerBIPPercent,
     
     -- Batting Average
