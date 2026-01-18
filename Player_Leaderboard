@@ -332,13 +332,13 @@ SELECT
         ((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) / NULLIF(BallsInPlay + Strikeouts, 0)), 3) as OPS,
     
     -- Swing/Miss metrics
-    ROUND(Swings * 100.0 / NULLIF(TotalPitches, 0), 2) as SwingPercent,
-    ROUND(Misses * 100.0 / NULLIF(Swings, 0), 2) as WhiffPercent,
-    
+    ROUND(Swings / NULLIF(TotalPitches, 0), 2) as SwingPercent,
+    ROUND(Misses / NULLIF(Swings, 0), 2) as WhiffPercent,
+
     -- Quality of contact
-    ROUND(Barrels * 100.0 / NULLIF(TotalPitches, 0), 2) as BarrelPercent,
-    ROUND(HardHits * 100.0 / NULLIF(TotalPitches, 0), 2) as HardHitPercent,
-    ROUND(SquaredUpCount * 100.0 / NULLIF(TotalPitches, 0), 2) as SquaredUpPercent,
+    ROUND(Barrels / NULLIF(TotalPitches, 0), 2) as BarrelPercent,
+    ROUND(HardHits / NULLIF(TotalPitches, 0), 2) as HardHitPercent,
+    ROUND(SquaredUpCount / NULLIF(TotalPitches, 0), 2) as SquaredUpPercent,
     
     -- Averages 
     ROUND(AvgExitVelocityRaw, 1) as AvgExitVelocity,
