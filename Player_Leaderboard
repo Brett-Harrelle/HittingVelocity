@@ -256,8 +256,8 @@ AggregatedData AS (
         SUM(HardHit) as HardHits,
         SUM(IsStrikeout) as Strikeouts,
         SUM(Iswalk) as Walks,
-        SUM(CASE WHEN BallInPlay = 1 THEN ExitVelocity END) as AvgExitVelocityRaw,
-		SUM(CASE WHEN BallInPlay = 1 THEN LaunchAngle END) as AvgLaunchAngleRaw,
+        SUM(CASE WHEN BallInPlay = 1 THEN ExitVelocity END) as ExitVelocityRaw,
+		SUM(CASE WHEN BallInPlay = 1 THEN LaunchAngle END) as LaunchAngleRaw,
         AVG(PitchSpeed) as AvgPitchSpeedRaw
         
     FROM AllThresholds
@@ -343,8 +343,8 @@ SELECT
     ROUND(SquaredUpCount / NULLIF(BallsInPlay, 0), 2) as SquaredUpPercent,
     
     -- Averages 
-    ROUND(AvgExitVelocityRaw, 1) as AvgExitVelocity,
-    ROUND(AvgLaunchAngleRaw, 1) as AvgLaunchAngle,
+    ROUND(ExitVelocityRaw, 1) as TotalExitVelocity,
+    ROUND(LaunchAngleRaw, 1) as TotalLaunchAngle,
     ROUND(AvgPitchSpeedRaw, 1) as AvgPitchSpeed
     
 FROM AggregatedData;
