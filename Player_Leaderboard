@@ -256,8 +256,8 @@ AggregatedData AS (
         SUM(HardHit) as HardHits,
         SUM(IsStrikeout) as Strikeouts,
         SUM(Iswalk) as Walks,
-        AVG(ExitVelocity) as AvgExitVelocityRaw,
-        AVG(LaunchAngle) as AvgLaunchAngleRaw,
+        AVG(CASE WHEN BallInPlay = 1 THEN ExitVelocity END) as AvgExitVelocityRaw,
+		AVG(CASE WHEN BallInPlay = 1 THEN LaunchAngle END) as AvgLaunchAngleRaw,
         AVG(PitchSpeed) as AvgPitchSpeedRaw
         
     FROM AllThresholds
