@@ -338,9 +338,9 @@ SELECT
     ROUND(Misses / NULLIF(Swings, 0), 2) as WhiffPercent,
 
     -- Quality of contact
-    ROUND(Barrels / NULLIF(TotalPitches, 0), 2) as BarrelPercent,
-    ROUND(HardHits / NULLIF(TotalPitches, 0), 2) as HardHitPercent,
-    ROUND(SquaredUpCount / NULLIF(TotalPitches, 0), 2) as SquaredUpPercent,
+    ROUND(Barrels / NULLIF(BallsInPlay, 0), 2) as BarrelPercent,
+    ROUND(HardHits / NULLIF(BallsInPlay, 0), 2) as HardHitPercent,
+    ROUND(SquaredUpCount / NULLIF(BallsInPlay, 0), 2) as SquaredUpPercent,
     
     -- Averages 
     ROUND(AvgExitVelocityRaw, 1) as AvgExitVelocity,
