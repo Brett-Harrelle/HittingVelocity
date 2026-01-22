@@ -27,7 +27,6 @@ SELECT
     SUM(vb.IsSingle + vb.IsDouble + vb.IsTriple + vb.IsHomeRun) as TotalHits,
     SUM(vb.IsDouble + vb.IsTriple + vb.IsHomeRun) as TotalXBH,
     SUM(vb.Barrel) as Barrels,
-    SUM(vb.SquaredUp) as SquaredUp,
     SUM(vb.HardHit) as HardHits,
     AVG(vb.ExitVelocity) as AvgExitVelocity,
     AVG(vb.LaunchAngle) as AvgLaunchAngle,
