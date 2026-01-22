@@ -34,7 +34,6 @@ SELECT
     pp.IsStrikeout,
     pp.IsWalk,
     pp.Barrel,
-    pp.SquaredUp,
     pp.HardHit,
     pp.ExitVelocity,
     pp.LaunchAngle,
