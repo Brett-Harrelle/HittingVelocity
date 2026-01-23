@@ -26,7 +26,6 @@ WITH PitchData AS (
         vb.IsDouble,
         vb.IsTriple,
         vb.Barrel,
-        vb.SquaredUp,
         vb.HardHit,
         vb.ExitVelocity,
         vb.LaunchAngle,
@@ -252,7 +251,6 @@ AggregatedData AS (
         SUM(IsSingle + IsDouble + IsTriple + IsHomeRun) as TotalHits,
         SUM(IsDouble + IsTriple + IsHomeRun) as TotalXBH,
         SUM(Barrel) as Barrels,
-        SUM(SquaredUp) as SquaredUpCount,
         SUM(HardHit) as HardHits,
         SUM(IsStrikeout) as Strikeouts,
         SUM(Iswalk) as Walks,
@@ -295,7 +293,6 @@ SELECT
     Misses,
     BallsInPlay,
     Barrels,
-    SquaredUpCount as SquaredUp,
     HardHits,
     Strikeouts,
     Walks,
@@ -340,7 +337,6 @@ SELECT
     -- Quality of contact
     ROUND(Barrels / NULLIF(BallsInPlay, 0), 2) as BarrelPercent,
     ROUND(HardHits / NULLIF(BallsInPlay, 0), 2) as HardHitPercent,
-    ROUND(SquaredUpCount / NULLIF(BallsInPlay, 0), 2) as SquaredUpPercent,
     
     -- Averages 
     ROUND(ExitVelocityRaw, 1) as TotalExitVelocity,
