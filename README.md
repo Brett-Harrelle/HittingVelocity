@@ -52,7 +52,7 @@ Barrel %
 Hard hit %
 Squared up %
 
-Squared up (Need 80%): EV / ((Bat Speed * 1.23) + (Pitch Speed * 0.2116))
+	Squared up (Need 80%): EV / ((Bat Speed * 1.23) + (Pitch Speed * 0.2116))	
 	Not in statcast for bat speed.  
 	Remove from project
 
