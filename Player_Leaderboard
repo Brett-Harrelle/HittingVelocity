@@ -1,402 +1,81 @@
 DROP VIEW IF EXISTS Player_Leaderboard;
 
 CREATE VIEW Player_Leaderboard AS
-WITH PitchData AS (
-    SELECT 
-        -- Player info
-        vb.PlayerID,
-        vb.PlayerName,
-        vb.FirstName,
-        vb.LastName,
-        vb.Bats,
-        vb.PlayerSeasonID,
-        vb.SeasonYear,
-        vb.Age,
-        vb.TeamName,
-        vb.TeamLeague,
-        vb.Division,
-        
-        -- Pitch metrics
-        vb.PitchSpeed,
-        vb.Swing,
-        vb.Miss,
-        vb.BallInPlay,
-        vb.IsHomeRun,
-        vb.IsSingle,
-        vb.IsDouble,
-        vb.IsTriple,
-        vb.Barrel,
-        vb.HardHit,
-        vb.ExitVelocity,
-        vb.LaunchAngle,
-        vb.IsStrikeout,
-        vb.IsWalk
-    FROM Velocity_Buckets vb
+WITH Thresholds AS (
+    SELECT '90+' VelocityThreshold,'Cumulative' ThresholdType,90 MinB,999 MaxB UNION ALL
+    SELECT '91+','Cumulative',91,999 UNION ALL SELECT '92+','Cumulative',92,999 UNION ALL
+    SELECT '93+','Cumulative',93,999 UNION ALL SELECT '94+','Cumulative',94,999 UNION ALL
+    SELECT '95+','Cumulative',95,999 UNION ALL SELECT '96+','Cumulative',96,999 UNION ALL
+    SELECT '97+','Cumulative',97,999 UNION ALL SELECT '98+','Cumulative',98,999 UNION ALL
+    SELECT '99+','Cumulative',99,999 UNION ALL SELECT '100+','Cumulative',100,999 UNION ALL
+    SELECT '101+','Cumulative',101,999 UNION ALL SELECT '102+','Cumulative',102,999 UNION ALL
+    SELECT '90.0-91.99','Range',90,92 UNION ALL SELECT '92.0-93.99','Range',92,94 UNION ALL
+    SELECT '94.0-95.99','Range',94,96 UNION ALL SELECT '96.0-97.99','Range',96,98 UNION ALL
+    SELECT '98.0-99.99','Range',98,100 UNION ALL SELECT '100.0+','Range',100,110
 ),
--- Create cumulative thresholds
-AllThresholds AS (
-    -- 90+
-    SELECT 
-        pd.*,
-        '90+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 90
-    
-    UNION ALL
-    
-    -- 91+
-    SELECT 
-        pd.*,
-        '91+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 91
-    
-    UNION ALL
-    
-    -- 92+ 
-    SELECT 
-        pd.*,
-        '92+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 92
-    
-    UNION ALL
-    
-    -- 93+ 
-    SELECT 
-        pd.*,
-        '93+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 93
-    
-    UNION ALL
-    
-    -- 94+ 
-    SELECT 
-        pd.*,
-        '94+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 94
-    
-    UNION ALL
-    
-    -- 95+
-    SELECT 
-        pd.*,
-        '95+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 95
-    
-    UNION ALL
-    
-    -- 96+ 
-    SELECT 
-        pd.*,
-        '96+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 96
-    
-    UNION ALL
-    
-    -- 97+ 
-    SELECT 
-        pd.*,
-        '97+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 97
-    
-    UNION ALL
-    
-    -- 98+ 
-    SELECT 
-        pd.*,
-        '98+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 98
-    
-    UNION ALL
-    
-    -- 99+ 
-    SELECT 
-        pd.*,
-        '99+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 99
-    
-    UNION ALL
-    
-    -- 100+ 
-    SELECT 
-        pd.*,
-        '100+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 100
-    
-    UNION ALL
-    
-    -- 101+ 
-    SELECT 
-        pd.*,
-        '101+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 101
-    
-    UNION ALL
-    
-    -- 102+ 
-    SELECT 
-        pd.*,
-        '102+' as VelocityThreshold,
-        'Cumulative' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 102
-    
-    UNION ALL
-    
-    -- 90.0-91.99 
-    SELECT 
-        pd.*,
-        '90.0-91.99' as VelocityThreshold,
-        'Range' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 90.0 AND pd.PitchSpeed < 92.0
-    
-    UNION ALL
-    
-    -- 92.0-93.99 
-    SELECT 
-        pd.*,
-        '92.0-93.99' as VelocityThreshold,
-        'Range' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 92.0 AND pd.PitchSpeed < 94.0
-    
-    UNION ALL
-    
-    -- 94.0-95.99 
-    SELECT 
-        pd.*,
-        '94.0-95.99' as VelocityThreshold,
-        'Range' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 94.0 AND pd.PitchSpeed < 96.0
-    
-    UNION ALL
-    
-    -- 96.0-97.99 
-    SELECT 
-        pd.*,
-        '96.0-97.99' as VelocityThreshold,
-        'Range' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 96.0 AND pd.PitchSpeed < 98.0
-    
-    UNION ALL
-    
-    -- 98.0-99.99 
-    SELECT 
-        pd.*,
-        '98.0-99.99' as VelocityThreshold,
-        'Range' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 98.0 AND pd.PitchSpeed < 100.0
-    
-     UNION ALL
-    
-    -- 100.0+
-    SELECT 
-        pd.*,
-        '100.0+' as VelocityThreshold,
-        'Range' as ThresholdType
-    FROM PitchData pd
-    WHERE pd.PitchSpeed >= 100.0 AND pd.PitchSpeed < 110.0
-),
-AggregatedData AS (
-    SELECT 
-        PlayerID,
-        PlayerName,
-        FirstName,
-        LastName,
-        Bats,
-        PlayerSeasonID,
-        SeasonYear,
-        Age,
-        TeamName,
-        TeamLeague,
-        Division,
-        VelocityThreshold,
-        ThresholdType,
-        
-        -- Aggregated metrics
-        COUNT(*) as TotalPitches,
-        SUM(Swing) as Swings,
-        SUM(Miss) as Misses,
-        SUM(BallInPlay) as BallsInPlay,
-        SUM(IsHomeRun) as HomeRuns,
-        SUM(IsSingle) as Singles,
-        SUM(IsDouble) as Doubles,
-        SUM(IsTriple) as Triples,
-        SUM(IsSingle + IsDouble + IsTriple + IsHomeRun) as TotalHits,
-        SUM(IsDouble + IsTriple + IsHomeRun) as TotalXBH,
-        SUM(Barrel) as Barrels,
-        SUM(HardHit) as HardHits,
-        SUM(IsStrikeout) as Strikeouts,
-        SUM(Iswalk) as Walks,
-        SUM(CASE WHEN BallInPlay = 1 THEN ExitVelocity END) as ExitVelocityRaw,
-		SUM(CASE WHEN BallInPlay = 1 THEN LaunchAngle END) as LaunchAngleRaw,
-        AVG(PitchSpeed) as AvgPitchSpeedRaw
-        
-    FROM AllThresholds
-    GROUP BY 
+Buckets AS (
+    SELECT
         PlayerID, PlayerName, FirstName, LastName, Bats,
         PlayerSeasonID, SeasonYear, Age, TeamName, TeamLeague, Division,
-        VelocityThreshold, ThresholdType
-    HAVING COUNT(*) >= 1  -- Minimum for leaderboards
+        FLOOR(PitchSpeed) AS SpeedBucket,
+        COUNT(*) AS Pitches,
+        SUM(PitchSpeed) AS SumSpeed,
+        SUM(Swing) AS Swings, SUM(Miss) AS Misses, SUM(BallInPlay) AS BallsInPlay,
+        SUM(IsSingle) AS Singles, SUM(IsDouble) AS Doubles, SUM(IsTriple) AS Triples,
+        SUM(IsHomeRun) AS HomeRuns, SUM(Barrel) AS Barrels, SUM(HardHit) AS HardHits,
+        SUM(IsStrikeout) AS Strikeouts, SUM(IsWalk) AS Walks,
+        SUM(CASE WHEN BallInPlay = 1 THEN ExitVelocity END) AS EVSum,
+        SUM(CASE WHEN BallInPlay = 1 THEN LaunchAngle END) AS LASum
+    FROM Velocity_Buckets
+    WHERE PitchSpeed >= 90
+    GROUP BY PlayerID, PlayerName, FirstName, LastName, Bats,
+             PlayerSeasonID, SeasonYear, Age, TeamName, TeamLeague, Division,
+             FLOOR(PitchSpeed)
+),
+AggregatedData AS (
+    SELECT
+        b.PlayerID, b.PlayerName, b.FirstName, b.LastName, b.Bats,
+        b.PlayerSeasonID, b.SeasonYear, b.Age, b.TeamName, b.TeamLeague, b.Division,
+        t.VelocityThreshold, t.ThresholdType,
+        SUM(b.Pitches) AS TotalPitches,
+        SUM(b.Swings) AS Swings, SUM(b.Misses) AS Misses, SUM(b.BallsInPlay) AS BallsInPlay,
+        SUM(b.Singles) AS Singles, SUM(b.Doubles) AS Doubles, SUM(b.Triples) AS Triples,
+        SUM(b.HomeRuns) AS HomeRuns, SUM(b.Barrels) AS Barrels, SUM(b.HardHits) AS HardHits,
+        SUM(b.Strikeouts) AS Strikeouts, SUM(b.Walks) AS Walks,
+        SUM(b.EVSum) AS ExitVelocityRaw, SUM(b.LASum) AS LaunchAngleRaw,
+        SUM(b.SumSpeed) / SUM(b.Pitches) AS AvgPitchSpeedRaw
+    FROM Buckets b
+    JOIN Thresholds t ON b.SpeedBucket >= t.MinB AND b.SpeedBucket < t.MaxB
+    GROUP BY b.PlayerID, b.PlayerName, b.FirstName, b.LastName, b.Bats,
+             b.PlayerSeasonID, b.SeasonYear, b.Age, b.TeamName, b.TeamLeague, b.Division,
+             t.VelocityThreshold, t.ThresholdType
 )
-SELECT 
-    -- Basic info
-    PlayerID,
-    PlayerName,
-    FirstName,
-    LastName,
-    Bats,
-    PlayerSeasonID,
-    SeasonYear,
-    Age,
-    TeamName,
-    TeamLeague,
-    Division,
-    VelocityThreshold,
-    ThresholdType,
-    TotalPitches,
-    
-    -- Count metrics
-    Singles,
-	Doubles,
-	Triples,
-	HomeRuns,
-    TotalXBH,
-    TotalHits,
-    Swings,
-    Misses,
-    BallsInPlay,
-    Barrels,
-    HardHits,
-    Strikeouts,
-    Walks,
-
-	-- Calculated Totals (Not including HBP or sacrifice hits)
-    
-	(BallsInPlay + Strikeouts) as AtBats,
-    (BallsInPlay + Strikeouts + Walks) as PlateAppearances,
-	(Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) as TotalBases,
-	
-    -- Calculated percentages
-
-    ROUND(HomeRuns / NULLIF(BallsInPlay + Strikeouts, 0), 3) as HRPercent,
-    ROUND(HomeRuns / NULLIF(Swings, 0), 3) as HRPerSwingPercent,
-    ROUND(TotalXBH / NULLIF(BallsInPlay + Strikeouts, 0), 3) as XBHPercent,
-    ROUND(TotalXBH / NULLIF(BallsInPlay, 0), 3) as XBHPerBIPPercent,
-	ROUND(Walks / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) as WalkPercent,
-    ROUND(Strikeouts / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) as StrikeoutPercent,
-    
-    -- Batting Average
-    
-    ROUND(TotalHits / NULLIF(BallsInPlay + Strikeouts, 0), 3) as BattingAvg,
-    
-    -- On Base Percentage (not including HBP and Sacrifice hits)
-    
-    ROUND((TotalHits + Walks) / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) as OnBasePercentageAvg,
-    
-    -- Slugging
-
-    ROUND((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) / NULLIF(BallsInPlay + Strikeouts, 0), 3) as SluggingPct,
-          
-	-- On Base Plus Slugging
-    
-    ROUND(
-        ((TotalHits + Walks) / NULLIF(BallsInPlay + Strikeouts + Walks, 0)) +
-        ((Singles + (Doubles * 2) + (Triples * 3) + (HomeRuns * 4)) / NULLIF(BallsInPlay + Strikeouts, 0)), 3) as OPS,
-    
-    -- Swing/Miss metrics
-    ROUND(Swings / NULLIF(TotalPitches, 0), 2) as SwingPercent,
-    ROUND(Misses / NULLIF(Swings, 0), 2) as WhiffPercent,
-
-    -- Quality of contact
-    ROUND(Barrels / NULLIF(BallsInPlay, 0), 2) as BarrelPercent,
-    ROUND(HardHits / NULLIF(BallsInPlay, 0), 2) as HardHitPercent,
-    
-    -- Averages 
-    ROUND(ExitVelocityRaw, 1) as TotalExitVelocity,
-    ROUND(LaunchAngleRaw, 1) as TotalLaunchAngle,
-    ROUND(AvgPitchSpeedRaw, 1) as AvgPitchSpeed
-    
+SELECT
+    PlayerID, PlayerName, FirstName, LastName, Bats, PlayerSeasonID, SeasonYear, Age,
+    TeamName, TeamLeague, Division, VelocityThreshold, ThresholdType, TotalPitches,
+    Singles, Doubles, Triples, HomeRuns,
+    (Doubles + Triples + HomeRuns) AS TotalXBH,
+    (Singles + Doubles + Triples + HomeRuns) AS TotalHits,
+    Swings, Misses, BallsInPlay, Barrels, HardHits, Strikeouts, Walks,
+    (BallsInPlay + Strikeouts) AS AtBats,
+    (BallsInPlay + Strikeouts + Walks) AS PlateAppearances,
+    (Singles + Doubles*2 + Triples*3 + HomeRuns*4) AS TotalBases,
+    ROUND(HomeRuns / NULLIF(BallsInPlay + Strikeouts, 0), 3) AS HRPercent,
+    ROUND(HomeRuns / NULLIF(Swings, 0), 3) AS HRPerSwingPercent,
+    ROUND((Doubles + Triples + HomeRuns) / NULLIF(BallsInPlay + Strikeouts, 0), 3) AS XBHPercent,
+    ROUND((Doubles + Triples + HomeRuns) / NULLIF(BallsInPlay, 0), 3) AS XBHPerBIPPercent,
+    ROUND(Walks / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) AS WalkPercent,
+    ROUND(Strikeouts / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) AS StrikeoutPercent,
+    ROUND((Singles + Doubles + Triples + HomeRuns) / NULLIF(BallsInPlay + Strikeouts, 0), 3) AS BattingAvg,
+    ROUND((Singles + Doubles + Triples + HomeRuns + Walks) / NULLIF(BallsInPlay + Strikeouts + Walks, 0), 3) AS OnBasePercentageAvg,
+    ROUND((Singles + Doubles*2 + Triples*3 + HomeRuns*4) / NULLIF(BallsInPlay + Strikeouts, 0), 3) AS SluggingPct,
+    ROUND(((Singles + Doubles + Triples + HomeRuns + Walks) / NULLIF(BallsInPlay + Strikeouts + Walks, 0))
+        + ((Singles + Doubles*2 + Triples*3 + HomeRuns*4) / NULLIF(BallsInPlay + Strikeouts, 0)), 3) AS OnBasePlusSluggingPercentage,
+    ROUND(Swings / NULLIF(TotalPitches, 0), 2) AS SwingPercent,
+    ROUND(Misses / NULLIF(Swings, 0), 2) AS WhiffPercent,
+    ROUND(Barrels / NULLIF(BallsInPlay, 0), 2) AS BarrelPercent,
+    ROUND(HardHits / NULLIF(BallsInPlay, 0), 2) AS HardHitPercent,
+    ROUND(ExitVelocityRaw, 1) AS TotalExitVelocity,
+    ROUND(LaunchAngleRaw, 1) AS TotalLaunchAngle,
+    ROUND(AvgPitchSpeedRaw, 1) AS AvgPitchSpeed
 FROM AggregatedData;
-
--- Test 1: See all thresholds with ThresholdType
-SELECT 
-    ThresholdType,
-    VelocityThreshold,
-    COUNT(*) as PlayerCount,
-    SUM(TotalPitches) as TotalPitches,
-    SUM(HomeRuns) as TotalHomeRuns,
-    ROUND(SUM(HomeRuns) * 100.0 / SUM(TotalPitches), 3) as OverallHRPercent
-FROM Player_Leaderboard
-GROUP BY ThresholdType, VelocityThreshold
-ORDER BY 
-    ThresholdType DESC,
-    CASE 
-        -- Cumulative thresholds first
-        WHEN VelocityThreshold = '90+' THEN 1
-        WHEN VelocityThreshold = '91+' THEN 2
-        WHEN VelocityThreshold = '92+' THEN 3
-        WHEN VelocityThreshold = '93+' THEN 4
-        WHEN VelocityThreshold = '94+' THEN 5
-        WHEN VelocityThreshold = '95+' THEN 6
-        WHEN VelocityThreshold = '96+' THEN 7
-        WHEN VelocityThreshold = '97+' THEN 8
-        WHEN VelocityThreshold = '98+' THEN 9
-        WHEN VelocityThreshold = '99+' THEN 10
-        WHEN VelocityThreshold = '100+' THEN 11
-        WHEN VelocityThreshold = '101+' THEN 12
-        WHEN VelocityThreshold = '102+' THEN 13
-        -- New ranges next
-        WHEN VelocityThreshold = '90.0-91.99' THEN 1
-        WHEN VelocityThreshold = '92.0-93.99' THEN 2
-        WHEN VelocityThreshold = '94.0-95.99' THEN 3
-        WHEN VelocityThreshold = '96.0-97.99' THEN 4
-        WHEN VelocityThreshold = '98.0-99.99' THEN 5
-        WHEN VelocityThreshold = '100.0+' THEN 6
-        ELSE 99
-    END;
-
--- Test 2: Verify no double-counting by checking total home runs by type
-SELECT 
-    'Total Home Runs by Threshold Type' as Metric,
-    ThresholdType,
-    SUM(HomeRuns) as TotalHomeRuns,
-    COUNT(DISTINCT PlayerID) as UniquePlayers
-FROM Player_Leaderboard
-GROUP BY ThresholdType;
-
--- Test 3: Check if ThresholdType correctly separates data
-SELECT 
-    ThresholdType,
-    COUNT(*) as TotalRows,
-    SUM(TotalPitches) as TotalPitchesInView,
-    SUM(HomeRuns) as TotalHomeRunsInView
-FROM Player_Leaderboard
-GROUP BY ThresholdType;
-
