@@ -1,3 +1,4 @@
+DROP database if exists hittingvelocity;
 DROP TABLE IF EXISTS PlayerPitches;
 DROP TABLE IF EXISTS PlayerSeasons;
 DROP TABLE IF EXISTS Teams;
@@ -66,7 +67,6 @@ Create Table PlayerPitches(
     IsWalk boolean,
     
     Barrel boolean,
-    SquaredUp boolean,
     HardHit boolean,
     
     PitcherThrows char(1),
